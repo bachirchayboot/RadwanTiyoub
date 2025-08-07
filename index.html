@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رضوان تيوب</title>
+    <title>رضوان تيوب - مع الريلز والتعليقات</title>
     <!-- تضمين خط Inter من جوجل -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <!-- تضمين Tailwind CSS عبر CDN -->
@@ -21,7 +21,7 @@
         /* تأثيرات التحويم والانتقال للعناصر */
         .card-hover:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -32,67 +32,174 @@
         <!-- رأس الصفحة مع الشعار (Radwan Tube) -->
         <header class="flex flex-col items-center justify-center mb-10">
             <h1 class="text-4xl md:text-6xl font-bold text-white text-radwan-red mb-2">رضوان تيوب</h1>
-            <p class="text-gray-400">شاهد مقاطع الفيديو المفضلة لديك</p>
+            <p class="text-gray-400">شاهد مقاطع الفيديو والريلز المفضلة لديك</p>
         </header>
 
-        <!-- شريط البحث -->
+        <!-- شريط البحث مع أزرار الفيديوهات والريلز -->
         <div class="max-w-2xl mx-auto mb-10">
-            <div class="flex rounded-full overflow-hidden bg-gray-800 border border-gray-700">
-                <input type="text" id="search-input" placeholder="ابحث عن مقاطع فيديو..." class="w-full p-3 md:p-4 text-white bg-transparent outline-none pr-6 placeholder-gray-500">
-                <button id="search-button" class="bg-radwan-red text-white font-bold px-6 md:px-8 py-3 rounded-full hover:bg-red-600 transition duration-300">
-                    بحث
+            <div class="flex rounded-full overflow-hidden bg-gray-800 border-2 border-gray-700 shadow-xl">
+                <input type="text" id="search-input" placeholder="ابحث عن مقاطع فيديو أو ريلز..." class="w-full p-3 md:p-4 text-white bg-transparent outline-none pr-6 placeholder-gray-500">
+                <button id="search-videos-button" class="bg-radwan-red text-white font-bold px-6 md:px-8 py-3 hover:bg-red-600 transition duration-300">
+                    فيديوهات
+                </button>
+                <button id="search-reels-button" class="bg-gray-700 text-white font-bold px-6 md:px-8 py-3 hover:bg-gray-600 transition duration-300">
+                    ريلز
                 </button>
             </div>
         </div>
 
         <!-- رسالة حالة التحميل أو الخطأ -->
         <div id="status-message" class="text-center text-gray-400 my-10 hidden">
-            جاري التحميل...
+            <div class="flex justify-center items-center">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-radwan-red" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                جاري التحميل...
+            </div>
         </div>
 
-        <!-- منطقة عرض الفيديوهات -->
+        <!-- مشغل الفيديو الرئيسي ومنطقة التفاعل -->
+        <div id="main-video-player" class="mb-10 hidden">
+            <div class="relative w-full overflow-hidden rounded-xl shadow-2xl" style="padding-top: 56.25%;">
+                <!-- هنا سيتم تضمين فيديو يوتيوب -->
+                <iframe id="video-iframe" class="absolute top-0 left-0 w-full h-full"
+                    src="" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            </div>
+            
+            <div class="mt-4 flex flex-col md:flex-row md:items-center justify-between">
+                <div>
+                    <h2 id="video-title" class="text-2xl font-bold"></h2>
+                    <p id="video-channel" class="text-gray-400"></p>
+                </div>
+
+                <!-- أزرار الإعجاب وعدم الإعجاب والمشاركة -->
+                <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                    <!-- زر الإعجاب -->
+                    <div class="flex items-center space-x-2 bg-gray-800 rounded-full px-4 py-2 border border-gray-700">
+                        <button id="like-button" class="flex items-center text-gray-400 hover:text-radwan-red transition-colors duration-200">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.4 5.4 0 0 1 7.5 3c1.74 0 3.48.81 4.5 2.09C13.02 3.81 14.76 3 16.5 3A5.4 5.4 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </button>
+                        <span id="like-count" class="text-gray-400">0</span>
+                        <div class="border-r border-gray-700 h-6"></div>
+                        <button id="dislike-button" class="flex items-center text-gray-400 hover:text-radwan-red transition-colors duration-200">
+                            <svg class="w-6 h-6 fill-current transform rotate-180" viewBox="0 0 24 24">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.4 5.4 0 0 1 7.5 3c1.74 0 3.48.81 4.5 2.09C13.02 3.81 14.76 3 16.5 3A5.4 5.4 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </button>
+                        <span id="dislike-count" class="text-gray-400">0</span>
+                    </div>
+
+                    <!-- زر المشاركة -->
+                    <button id="share-button" class="flex items-center text-gray-400 hover:text-radwan-red transition-colors duration-200 bg-gray-800 rounded-full px-4 py-2 border border-gray-700">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.195 9 11.025 9 9.878c0-1.147-.114-2.317-.316-3.464l-1.39-1.954a2.222 2.222 0 013.88-2.697l1.39 1.954c.202 1.147.316 2.317.316 3.464 0 1.147-.114 2.317-.316 3.464l1.39 1.954a2.222 2.222 0 01-3.88 2.697l-1.39-1.954zM16 12c-2.485 0-4.5 2.015-4.5 4.5S13.515 21 16 21s4.5-2.015 4.5-4.5S18.485 12 16 12z"></path>
+                        </svg>
+                        مشاركة
+                    </button>
+                </div>
+            </div>
+            
+            <!-- قسم التعليقات -->
+            <div class="mt-8">
+                <h3 class="text-xl font-bold mb-4">التعليقات</h3>
+                <div id="comments-container" class="space-y-4">
+                    <!-- سيتم إضافة التعليقات هنا بواسطة JavaScript -->
+                </div>
+                <div class="mt-6 flex flex-col md:flex-row items-end space-y-4 md:space-y-0 md:space-x-4">
+                    <textarea id="comment-input" rows="3" placeholder="أضف تعليقًا..." class="w-full bg-gray-800 rounded-lg p-3 text-white placeholder-gray-500 resize-none border border-gray-700 focus:outline-none focus:ring-2 focus:ring-radwan-red"></textarea>
+                    <button id="add-comment-button" class="bg-radwan-red text-white font-bold px-6 py-2 rounded-lg hover:bg-red-600 transition duration-300 w-full md:w-auto">
+                        إضافة تعليق
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- منطقة عرض الفيديوهات (اقتراحات) -->
+        <h2 id="suggestions-title" class="text-2xl font-bold mt-10 mb-6 hidden">مقاطع فيديو مقترحة</h2>
         <div id="videos-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
             <!-- سيتم ملء هذه المنطقة بالفيديوهات بواسطة JavaScript -->
         </div>
 
     </div>
 
+    <!-- نافذة منبثقة مخصصة -->
+    <div id="custom-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl max-w-sm w-full mx-4">
+            <div id="modal-content"></div>
+            <div class="flex justify-end mt-6">
+                <button id="modal-close-button" class="bg-radwan-red text-white font-bold px-6 py-2 rounded-full hover:bg-red-600 transition duration-300">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // احصل على عناصر HTML
         const searchInput = document.getElementById('search-input');
-        const searchButton = document.getElementById('search-button');
+        const searchVideosButton = document.getElementById('search-videos-button');
+        const searchReelsButton = document.getElementById('search-reels-button');
         const videosContainer = document.getElementById('videos-container');
         const statusMessage = document.getElementById('status-message');
+        const mainVideoPlayer = document.getElementById('main-video-player');
+        const videoIframe = document.getElementById('video-iframe');
+        const videoTitle = document.getElementById('video-title');
+        const videoChannel = document.getElementById('video-channel');
+        const likeButton = document.getElementById('like-button');
+        const dislikeButton = document.getElementById('dislike-button');
+        const likeCountElement = document.getElementById('like-count');
+        const dislikeCountElement = document.getElementById('dislike-count');
+        const suggestionsTitle = document.getElementById('suggestions-title');
+        const shareButton = document.getElementById('share-button');
+        const customModal = document.getElementById('custom-modal');
+        const modalContent = document.getElementById('modal-content');
+        const modalCloseButton = document.getElementById('modal-close-button');
+        const commentsContainer = document.getElementById('comments-container');
+        const commentInput = document.getElementById('comment-input');
+        const addCommentButton = document.getElementById('add-comment-button');
 
         // مفتاح API الخاص بـ YouTube.
-        // يجب استبدال "YOUR_YOUTUBE_API_KEY" بمفتاح API الخاص بك.
-        // يمكنك الحصول على مفتاح من Google Cloud Console.
         const apiKey = 'AIzaSyBJ0wDMXcIpVhwX4Sl3LbYQxKftX3Vb3bs';
+        
+        // بيانات وهمية لعدد الإعجابات والتعليقات
+        const mockVideoData = {};
 
         // دالة لعرض رسالة حالة للمستخدم
         function showStatusMessage(message, isError = false) {
-            statusMessage.textContent = message;
+            statusMessage.innerHTML = isError ? 
+                `<p class="text-red-500">${message}</p>` : 
+                `<div class="flex justify-center items-center"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-radwan-red" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>${message}</div>`;
             statusMessage.classList.remove('hidden');
-            if (isError) {
-                statusMessage.classList.add('text-red-500');
-            } else {
-                statusMessage.classList.remove('text-red-500');
-            }
+        }
+
+        // دالة لعرض نافذة منبثقة مخصصة
+        function showModal(content) {
+            modalContent.innerHTML = content;
+            customModal.classList.remove('hidden');
         }
 
         // دالة لجلب الفيديوهات من YouTube API
-        async function fetchVideos(query) {
+        async function fetchVideos(query, isReel = false) {
             // تحقق من وجود مفتاح API
             if (apiKey === 'YOUR_YOUTUBE_API_KEY' || !apiKey) {
                 showStatusMessage('يرجى إضافة مفتاح API الخاص بك في الكود.', true);
                 return;
             }
 
-            // عرض رسالة "جاري التحميل"
             showStatusMessage('جاري التحميل...');
             videosContainer.innerHTML = '';
+            mainVideoPlayer.classList.add('hidden');
+            suggestionsTitle.classList.add('hidden');
 
-            const url = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&q=${encodeURIComponent(query)}&part=snippet&maxResults=25&type=video`;
+            // إضافة عوامل تصفية (filters) للبحث عن الريلز إذا طلب المستخدم ذلك
+            const queryWithFilters = isReel ? `${query} short` : query;
+            const url = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&q=${encodeURIComponent(queryWithFilters)}&part=snippet&maxResults=25&type=video`;
 
             try {
                 const response = await fetch(url);
@@ -101,13 +208,13 @@
                 }
                 const data = await response.json();
                 
-                // إخفاء رسالة الحالة
                 statusMessage.classList.add('hidden');
 
                 if (data.items.length === 0) {
                     showStatusMessage('لا توجد نتائج مطابقة لبحثك.');
                 } else {
-                    renderVideos(data.items);
+                    loadVideo(data.items[0]);
+                    renderVideos(data.items.slice(1));
                 }
 
             } catch (error) {
@@ -116,7 +223,29 @@
             }
         }
 
-        // دالة لعرض الفيديوهات على الصفحة
+        // دالة لتحميل فيديو في المشغل الرئيسي
+        function loadVideo(video) {
+            const videoId = video.id.videoId;
+            const title = video.snippet.title;
+            const channelTitle = video.snippet.channelTitle;
+
+            videoIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            videoTitle.textContent = title;
+            videoChannel.textContent = channelTitle;
+            
+            // تحديث العدادات من البيانات الوهمية أو تعيينها إلى صفر
+            if (!mockVideoData[videoId]) {
+                mockVideoData[videoId] = { likes: 0, dislikes: 0, comments: [] };
+            }
+            likeCountElement.textContent = mockVideoData[videoId].likes;
+            dislikeCountElement.textContent = mockVideoData[videoId].dislikes;
+            renderComments(mockVideoData[videoId].comments);
+
+            mainVideoPlayer.classList.remove('hidden');
+            suggestionsTitle.classList.remove('hidden');
+        }
+
+        // دالة لعرض الفيديوهات كبطاقات
         function renderVideos(videos) {
             videosContainer.innerHTML = ''; // مسح المحتوى الحالي
             videos.forEach(video => {
@@ -125,13 +254,14 @@
                 const channelTitle = video.snippet.channelTitle;
                 const thumbnailUrl = video.snippet.thumbnails.high.url;
 
-                // إنشاء عنصر بطاقة الفيديو
-                const videoCard = document.createElement('a');
-                videoCard.href = `https://www.youtube.com/watch?v=${videoId}`;
-                videoCard.target = '_blank'; // فتح الفيديو في علامة تبويب جديدة
-                videoCard.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 card-hover';
+                const videoCard = document.createElement('div');
+                videoCard.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 card-hover cursor-pointer';
+                
+                videoCard.addEventListener('click', () => {
+                    loadVideo(video);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
 
-                // إضافة محتوى البطاقة
                 videoCard.innerHTML = `
                     <img src="${thumbnailUrl}" alt="${title}" class="w-full h-auto object-cover">
                     <div class="p-4">
@@ -142,20 +272,122 @@
                 videosContainer.appendChild(videoCard);
             });
         }
+        
+        // دالة لعرض التعليقات
+        function renderComments(comments) {
+            commentsContainer.innerHTML = '';
+            if (comments.length === 0) {
+                commentsContainer.innerHTML = '<p class="text-gray-500">لا توجد تعليقات حتى الآن. كن أول من يعلق!</p>';
+            } else {
+                comments.forEach(comment => {
+                    const commentElement = document.createElement('div');
+                    commentElement.className = 'bg-gray-800 p-4 rounded-lg border border-gray-700';
+                    commentElement.innerHTML = `<p class="text-gray-300">${comment}</p>`;
+                    commentsContainer.appendChild(commentElement);
+                });
+            }
+        }
 
-        // معالجة حدث النقر على زر البحث
-        searchButton.addEventListener('click', () => {
+        // معالجة حدث النقر على زر البحث عن الفيديوهات
+        searchVideosButton.addEventListener('click', () => {
             const query = searchInput.value;
             if (query) {
-                fetchVideos(query);
+                fetchVideos(query, false);
+            }
+        });
+
+        // معالجة حدث النقر على زر البحث عن الريلز
+        searchReelsButton.addEventListener('click', () => {
+            const query = searchInput.value;
+            if (query) {
+                fetchVideos(query, true);
             }
         });
 
         // معالجة حدث الضغط على زر Enter في شريط البحث
         searchInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
-                searchButton.click();
+                searchVideosButton.click();
             }
+        });
+
+        // معالجة حدث النقر على زر الإعجاب
+        likeButton.addEventListener('click', () => {
+            const currentVideoId = videoIframe.src.split('embed/')[1].split('?')[0];
+            if (currentVideoId) {
+                if (!mockVideoData[currentVideoId]) {
+                    mockVideoData[currentVideoId] = { likes: 0, dislikes: 0, comments: [] };
+                }
+                mockVideoData[currentVideoId].likes++;
+                likeCountElement.textContent = mockVideoData[currentVideoId].likes;
+            }
+        });
+
+        // معالجة حدث النقر على زر عدم الإعجاب
+        dislikeButton.addEventListener('click', () => {
+            const currentVideoId = videoIframe.src.split('embed/')[1].split('?')[0];
+            if (currentVideoId) {
+                if (!mockVideoData[currentVideoId]) {
+                    mockVideoData[currentVideoId] = { likes: 0, dislikes: 0, comments: [] };
+                }
+                mockVideoData[currentVideoId].dislikes++;
+                dislikeCountElement.textContent = mockVideoData[currentVideoId].dislikes;
+            }
+        });
+
+        // معالجة حدث النقر على زر المشاركة
+        shareButton.addEventListener('click', async () => {
+            const currentVideoId = videoIframe.src.split('embed/')[1].split('?')[0];
+            const shareUrl = `https://www.youtube.com/watch?v=${currentVideoId}`;
+            
+            if (navigator.clipboard) {
+                try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    showModal('<p class="text-white">تم نسخ رابط الفيديو بنجاح!</p>');
+                } catch (err) {
+                    const tempInput = document.createElement('input');
+                    tempInput.value = shareUrl;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    showModal('<p class="text-white">تم نسخ رابط الفيديو بنجاح!</p>');
+                }
+            } else {
+                const tempInput = document.createElement('input');
+                tempInput.value = shareUrl;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                showModal('<p class="text-white">تم نسخ رابط الفيديو بنجاح!</p>');
+            }
+        });
+        
+        // معالجة حدث إضافة التعليق
+        addCommentButton.addEventListener('click', () => {
+            const commentText = commentInput.value.trim();
+            const currentVideoId = videoIframe.src.split('embed/')[1].split('?')[0];
+            
+            if (commentText && currentVideoId) {
+                // إضافة التعليق إلى البيانات الوهمية
+                if (!mockVideoData[currentVideoId]) {
+                    mockVideoData[currentVideoId] = { likes: 0, dislikes: 0, comments: [] };
+                }
+                mockVideoData[currentVideoId].comments.push(commentText);
+                
+                // عرض التعليقات المحدثة
+                renderComments(mockVideoData[currentVideoId].comments);
+                
+                // مسح مربع الإدخال
+                commentInput.value = '';
+            }
+        });
+
+
+        // إغلاق النافذة المنبثقة
+        modalCloseButton.addEventListener('click', () => {
+            customModal.classList.add('hidden');
         });
 
         // جلب الفيديوهات الافتراضية عند تحميل الصفحة
