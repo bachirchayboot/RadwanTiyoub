@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رضوان تيوب</title>
+    <!-- تضمين خط Inter من جوجل -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- تضمين Tailwind CSS عبر CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .text-radwan-red {
+            color: #E50914; /* لون أحمر مخصص */
+        }
+        .bg-radwan-red {
+            background-color: #E50914; /* لون أحمر مخصص */
+        }
+        /* تأثيرات التحويم والانتقال للعناصر */
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- حاوية رئيسية للتطبيق -->
+    <div class="container mx-auto p-4 md:p-8 min-h-screen">
+
+        <!-- رأس الصفحة مع الشعار (Radwan Tube) -->
+        <header class="flex flex-col items-center justify-center mb-10">
+            <h1 class="text-4xl md:text-6xl font-bold text-white text-radwan-red mb-2">رضوان تيوب</h1>
+            <p class="text-gray-400">شاهد مقاطع الفيديو المفضلة لديك</p>
+        </header>
+
+        <!-- شريط البحث -->
+        <div class="max-w-2xl mx-auto mb-10">
+            <div class="flex rounded-full overflow-hidden bg-gray-800 border border-gray-700">
+                <input type="text" id="search-input" placeholder="ابحث عن مقاطع فيديو..." class="w-full p-3 md:p-4 text-white bg-transparent outline-none pr-6 placeholder-gray-500">
+                <button id="search-button" class="bg-radwan-red text-white font-bold px-6 md:px-8 py-3 rounded-full hover:bg-red-600 transition duration-300">
+                    بحث
+                </button>
+            </div>
+        </div>
+
+        <!-- رسالة حالة التحميل أو الخطأ -->
+        <div id="status-message" class="text-center text-gray-400 my-10 hidden">
+            جاري التحميل...
+        </div>
+
+        <!-- منطقة عرض الفيديوهات -->
+        <div id="videos-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+            <!-- سيتم ملء هذه المنطقة بالفيديوهات بواسطة JavaScript -->
+        </div>
+
+    </div>
+
+    <script>
+        // احصل على عناصر HTML
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const videosContainer = document.getElementById('videos-container');
+        const statusMessage = document.getElementById('status-message');
+
+        // مفتاح API الخاص بـ YouTube.
+        // يجب استبدال "YOUR_YOUTUBE_API_KEY" بمفتاح API الخاص بك.
+        // يمكنك الحصول على مفتاح من Google Cloud Console.
+        const apiKey = 'AIzaSyBJ0wDMXcIpVhwX4Sl3LbYQxKftX3Vb3bs';
+
+        // دالة لعرض رسالة حالة للمستخدم
+        function showStatusMessage(message, isError = false) {
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('hidden');
+            if (isError) {
+                statusMessage.classList.add('text-red-500');
+            } else {
+                statusMessage.classList.remove('text-red-500');
+            }
+        }
+
+        // دالة لجلب الفيديوهات من YouTube API
+        async function fetchVideos(query) {
+            // تحقق من وجود مفتاح API
+            if (apiKey === 'YOUR_YOUTUBE_API_KEY' || !apiKey) {
+                showStatusMessage('يرجى إضافة مفتاح API الخاص بك في الكود.', true);
+                return;
+            }
+
+            // عرض رسالة "جاري التحميل"
+            showStatusMessage('جاري التحميل...');
+            videosContainer.innerHTML = '';
+
+            const url = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&q=${encodeURIComponent(query)}&part=snippet&maxResults=25&type=video`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`خطأ في جلب البيانات: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // إخفاء رسالة الحالة
+                statusMessage.classList.add('hidden');
+
+                if (data.items.length === 0) {
+                    showStatusMessage('لا توجد نتائج مطابقة لبحثك.');
+                } else {
+                    renderVideos(data.items);
+                }
+
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                showStatusMessage('حدث خطأ في جلب الفيديوهات. يرجى المحاولة مرة أخرى.', true);
+            }
+        }
+
+        // دالة لعرض الفيديوهات على الصفحة
+        function renderVideos(videos) {
+            videosContainer.innerHTML = ''; // مسح المحتوى الحالي
+            videos.forEach(video => {
+                const videoId = video.id.videoId;
+                const title = video.snippet.title;
+                const channelTitle = video.snippet.channelTitle;
+                const thumbnailUrl = video.snippet.thumbnails.high.url;
+
+                // إنشاء عنصر بطاقة الفيديو
+                const videoCard = document.createElement('a');
+                videoCard.href = `https://www.youtube.com/watch?v=${videoId}`;
+                videoCard.target = '_blank'; // فتح الفيديو في علامة تبويب جديدة
+                videoCard.className = 'bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 card-hover';
+
+                // إضافة محتوى البطاقة
+                videoCard.innerHTML = `
+                    <img src="${thumbnailUrl}" alt="${title}" class="w-full h-auto object-cover">
+                    <div class="p-4">
+                        <h3 class="text-white text-lg font-bold mb-2 line-clamp-2">${title}</h3>
+                        <p class="text-gray-400 text-sm">${channelTitle}</p>
+                    </div>
+                `;
+                videosContainer.appendChild(videoCard);
+            });
+        }
+
+        // معالجة حدث النقر على زر البحث
+        searchButton.addEventListener('click', () => {
+            const query = searchInput.value;
+            if (query) {
+                fetchVideos(query);
+            }
+        });
+
+        // معالجة حدث الضغط على زر Enter في شريط البحث
+        searchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                searchButton.click();
+            }
+        });
+
+        // جلب الفيديوهات الافتراضية عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            fetchVideos('أخبار تقنية'); // يمكنك تغيير هذا ليعرض أي شيء تريده
+        });
+    </script>
+</body>
+</html>
